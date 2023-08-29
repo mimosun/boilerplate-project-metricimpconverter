@@ -28,8 +28,9 @@ function ConvertHandler() {
   }
 
   this.getNum = function(input) {
-    let num = input.match(/\-?\d+\.?\d*([\/]\d+\.?\d*)*/g);
-    num = num && num[0] ? num[0] : null;
+    // /\-?\d+\.?\d*([\/]\d+\.?\d*)*/g
+    let num = input.match(/[\-\d\.\/]/g);
+    num = num && num.length ? num.join('') : null;
 
     if (!num) {
       return 1;
@@ -39,7 +40,12 @@ function ConvertHandler() {
       return null;
     }
 
-    return eval(num);
+    try {
+      return eval(num);
+    } catch (err) {
+      return null;
+    }
+
   };
 
   this.getUnit = function(input) {
@@ -65,37 +71,38 @@ function ConvertHandler() {
     const galToL = 3.78541;
     const lbsToKg = 0.453592;
     const miToKm = 1.60934;
-
     const returnUnit = this.getReturnUnit(initUnit);
+    let returnNum = 0;
 
     // gal-L
     if (initUnit === 'gal' && returnUnit === 'l') {
-      return initNum * galToL;
+      returnNum = initNum * galToL;
     }
 
-    if (initUnit === 'l' && returnUnit === 'gal') {
-      return initNum / galToL;
+    // L-gal
+    else if (initUnit === 'l' && returnUnit === 'gal') {
+      returnNum = initNum / galToL;
     }
 
     // lbs-Kg
-    if (initUnit === 'lbs' && returnUnit === 'kg') {
-      return initNum * lbsToKg;
+    else if (initUnit === 'lbs' && returnUnit === 'kg') {
+      returnNum = initNum * lbsToKg;
     }
 
-    if (initUnit === 'kg' && returnUnit === 'lbs') {
-      return initNum / lbsToKg;
+    else if (initUnit === 'kg' && returnUnit === 'lbs') {
+      returnNum = initNum / lbsToKg;
     }
 
     // mi-Km
-    if (initUnit === 'mi' && returnUnit === 'km') {
-      return initNum * miToKm;
+    else if (initUnit === 'mi' && returnUnit === 'km') {
+      returnNum = initNum * miToKm;
     }
 
-    if (initUnit === 'km' && returnUnit === 'mi') {
-      return initNum / miToKm;
+    else if (initUnit === 'km' && returnUnit === 'mi') {
+      returnNum = initNum / miToKm;
     }
 
-    return null;
+    return Number.isInteger(returnNum) ? returnNum : parseFloat(returnNum.toFixed(5));
   };
 
   this.getString = function(initNum, initUnit, returnNum, returnUnit) {

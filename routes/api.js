@@ -8,11 +8,11 @@ module.exports = function(app) {
   let convertHandler = new ConvertHandler();
 
   app.get('/api/convert', function(req, res) {
-    const input = req.query.input;
+    const input = req.query.input ? req.query.input.toLowerCase() : '';
     const initNum = convertHandler.getNum(input);
     const initUnit = convertHandler.getUnit(input);
 
-    if (!initNum && !initUnit) {
+    if (!input || (!initNum && !initUnit)) {
       res.json({ error: 'invalid number and unit' });
       return;
     } else if (!initNum) {
@@ -30,8 +30,6 @@ module.exports = function(app) {
       res.json({ error: 'convert error' });
       return;
     }
-
-    returnNum = Number.isInteger(returnNum) ? returnNum : returnNum.toFixed(5);
 
     res.json({
       initNum: initNum,
